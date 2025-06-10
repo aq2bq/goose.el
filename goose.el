@@ -1,4 +1,5 @@
 ;;; goose.el --- Integrate Emacs with Goose CLI via EAT -*- lexical-binding: t; -*-
+;;; goose.el --- Integrate Emacs with Goose CLI via vterm -*- lexical-binding: t; -*-
 
 ;; Author: Daisuke Terada <pememo@gmail.com>
 ;; Package-Requires: ((emacs "29") (eat "0.9.4") (transient "0.9.1") (consult "2.5"))
@@ -22,12 +23,12 @@
 ;;
 
 ;;; Code:
-(require 'eat)
+(require 'vterm)
 (require 'transient)
 (require 'consult)
 
 (defgroup goose nil
-  "Goose CLI integration using EAT."
+  "Goose CLI integration using vterm."
   :group 'tools)
 
 (defcustom goose-program-name "goose"
@@ -86,15 +87,17 @@ Use %s as placeholder for the raw text."
   (let ((bufname (format "%s<%s>" goose-default-buffer-name label)))
     (when (get-buffer bufname)
       (kill-buffer bufname))
-    (let ((eat-buffer (apply #'eat-make bufname
-                              goose-program-name
-                              nil
-                              args)))
-      (with-current-buffer eat-buffer
-        (rename-buffer bufname t))
+    (let ((vterm-buffer (generate-new-buffer bufname)))
+      (with-current-buffer vterm-buffer
+        (let ((vterm-shell "/bin/bash")) ; vtermはSHELL起動
+          (vterm-mode)
+          (rename-buffer bufname t)
+          (vterm-send-string
+           (mapconcat #'identity (cons goose-program-name args) " "))
+          (vterm-send-return)))
       (setq goose--last-label label
             goose--last-args  args)
-      (switch-to-buffer eat-buffer)
+      (switch-to-buffer vterm-buffer)
       (message "Goose session started in buffer %s" bufname))))
 
 ;;;###autoload
@@ -125,11 +128,8 @@ Applies `goose-context-format` to TEXT before sending."
          (buf     (get-buffer bufname)))
     (unless buf (error "No Goose session buffer found"))
     (with-current-buffer buf
-      (let ((proc (get-buffer-process (current-buffer))))
-        (unless (and proc (process-live-p proc))
-          (error "No live Goose process in buffer"))
-        (process-send-string proc
-                             (format goose-context-format text))))))
+      (vterm-send-string (format goose-context-format text))
+      (vterm-send-C-j))))
 
 ;;;###autoload
 (defun goose-add-context-file-path ()
@@ -144,8 +144,7 @@ Applies `goose-context-format` to TEXT before sending."
   "Insert the current buffer's content and file path into the Goose prompt."
   (interactive)
   (goose--insert-context
-   (format "File: %s
-%s"
+   (format "File: %s\n%s"
            (or (buffer-file-name) "<no file>")
            (buffer-string)))
   (message "Inserted buffer content into prompt"))
@@ -156,9 +155,7 @@ Applies `goose-context-format` to TEXT before sending."
   (interactive)
   (unless (use-region-p) (error "No region selected"))
   (goose--insert-context
-   (format "File: %s
-Region:
-%s"
+   (format "File: %s\nRegion:\n%s"
            (or (buffer-file-name) "<no file>")
            (buffer-substring-no-properties
             (region-beginning)
