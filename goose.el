@@ -108,12 +108,13 @@ Use %s as placeholder for the raw text."
         (let ((vterm-shell "/bin/bash"))
           (vterm-mode)
           (rename-buffer bufname t)
+          (vterm-send-C-l) ;; suppress any previous output
           (vterm-send-string
            (mapconcat #'identity (cons goose-program-name args) " "))
           (vterm-send-return)))
       (setq goose--last-label label
             goose--last-args  args)
-      (switch-to-buffer vterm-buffer)
+      (pop-to-buffer vterm-buffer)
       (message "Goose session started in buffer %s" bufname))))
 
 ;;;###autoload
