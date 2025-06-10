@@ -7,7 +7,7 @@
 ;; URL: https://github.com/aq2bq/goose.el
 
 ;;; Commentary:
-;; Seamless integration of the Goose CLI within Emacs using the EAT terminal emulator.
+;; Seamless integration of the Goose CLI within Emacs using the `vterm` terminal emulator.
 ;;
 ;; Provides:
 ;; - Intuitive session management: start and restart Goose CLI sessions with easy labeling (name or timestamp)
@@ -20,6 +20,30 @@
 ;;   M-x goose-start-session
 ;;   M-x goose-add-context-buffer ; send current buffer to the Goose session
 ;;
+
+;; The MIT License (MIT)
+;;
+;; Copyright (c) 2025 Daisuke Terada
+;;
+;; Permission is hereby granted, free of charge, to any person obtaining a copy
+;; of this software and associated documentation files (the "Software"), to deal
+;; in the Software without restriction, including without limitation the rights
+;; to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+;; copies of the Software, and to permit persons to whom the Software is
+;; furnished to do so, subject to the following conditions:
+;;
+;; The above copyright notice and this permission notice shall be included in all
+;; copies or substantial portions of the Software.
+;;
+;; THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+;; IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+;; FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+;; AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+;; LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+;; OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+;; SOFTWARE.
+
+;;; Code:
 
 ;;; Code:
 (require 'vterm)
@@ -81,7 +105,7 @@ Use %s as placeholder for the raw text."
       (kill-buffer bufname))
     (let ((vterm-buffer (generate-new-buffer bufname)))
       (with-current-buffer vterm-buffer
-        (let ((vterm-shell "/bin/bash")) ; vtermはSHELL起動
+        (let ((vterm-shell "/bin/bash"))
           (vterm-mode)
           (rename-buffer bufname t)
           (vterm-send-string
@@ -115,10 +139,13 @@ Use %s as placeholder for the raw text."
 
 (defun goose--insert-context (text)
   "Send TEXT as input to the current Goose session, deferring execution until RET.
-Applies `goose-context-format` to TEXT before sending."
+Applies `goose-context-format` to TEXT before sending.
+If the session is not started, starts it automatically."
   (let* ((bufname (goose--session-buffer-name))
          (buf     (get-buffer bufname)))
-    (unless buf (error "No Goose session buffer found"))
+    (unless buf
+      (goose-start-session)
+      (setq buf (get-buffer (goose--session-buffer-name))))
     (with-current-buffer buf
       (vterm-send-string (format goose-context-format text))
       (vterm-send-C-j))))
