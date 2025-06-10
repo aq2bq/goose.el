@@ -1,8 +1,7 @@
-;;; goose.el --- Integrate Emacs with Goose CLI via EAT -*- lexical-binding: t; -*-
 ;;; goose.el --- Integrate Emacs with Goose CLI via vterm -*- lexical-binding: t; -*-
 
 ;; Author: Daisuke Terada <pememo@gmail.com>
-;; Package-Requires: ((emacs "29") (eat "0.9.4") (transient "0.9.1") (consult "2.5"))
+;; Package-Requires: ((emacs "29") (vterm "20241218.331") (transient "0.9.1") (consult "2.5"))
 ;; Version: 0.1.0
 ;; Keywords: tools, convenience, ai
 ;; URL: https://github.com/aq2bq/goose.el
@@ -41,11 +40,6 @@
   :type 'string
   :group 'goose)
 
-(defcustom goose-disable-spinner nil
-  "When non-nil, pass `--no-spinner` to Goose to disable spinner output."
-  :type 'boolean
-  :group 'goose)
-
 (defcustom goose-prompt-directory (expand-file-name "~/.config/goose/prompts/")
   "Directory containing prompt templates for Goose integration."
   :type 'directory
@@ -78,8 +72,6 @@ Use %s as placeholder for the raw text."
   "Construct Goose CLI argument list for 'session --name LABEL'."
   (let* ((label (goose--session-label name))
          (base-args (list "session" "--name" label)))
-    (when goose-disable-spinner
-      (setq base-args (append base-args '("--no-spinner"))))
     base-args))
 
 (defun goose--run-session (label args)
