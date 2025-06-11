@@ -44,11 +44,23 @@
 ;; SOFTWARE.
 
 ;;; Code:
-
-;;; Code:
 (require 'vterm)
 (require 'transient)
 (require 'consult)
+
+(define-derived-mode goose-mode vterm-mode "Goose"
+  "Major mode for Goose terminal (inherits vterm-mode).
+This mode provides `goose-mode-hook` for customizations.
+Do not call this mode interactively. Use `goose-start-session` instead."
+  (when (called-interactively-p 'interactive)
+    (user-error "`goose-mode` is an internal mode. Use `M-x goose-start-session` instead.")))
+
+;; Prevent interactive use from misapplying to the current buffer
+(put 'goose-mode 'function-documentation
+     "Goose terminal mode. Do not call directly. Use `goose-start-session` instead.")
+(put 'goose-mode 'interactive-form
+     '(progn (user-error "`goose-mode` is not meant to be called interactively. Use `M-x goose-start-session` instead.")))
+
 
 (defgroup goose nil
   "Goose CLI integration using vterm."
@@ -106,7 +118,7 @@ Use %s as placeholder for the raw text."
     (let ((vterm-buffer (generate-new-buffer bufname)))
       (with-current-buffer vterm-buffer
         (let ((vterm-shell "/bin/bash"))
-          (vterm-mode)
+          (goose-mode)
           (rename-buffer bufname t)
           (vterm-send-C-l) ;; suppress any previous output
           (vterm-send-string
@@ -156,7 +168,7 @@ If the session is not started, starts it automatically."
   "Insert the current buffer's file path into the Goose prompt."
   (interactive)
   (unless (buffer-file-name) (error "Buffer is not visiting a file"))
-  (goose--insert-context (format "File path: %s" (buffer-file-name)))
+  (goose--insert-context (format "Please read file from path: %s" (buffer-file-name)))
   (message "Inserted file path into prompt"))
 
 ;;;###autoload
