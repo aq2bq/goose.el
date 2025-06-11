@@ -87,6 +87,21 @@ Use %s as placeholder for the raw text."
   :type 'string
   :group 'goose)
 
+(defcustom goose-context-file-path-prefix "File from path: %s"
+  "Prefix format for inserting file path into Goose. %s will be replaced by the file path."
+  :type 'string
+  :group 'goose)
+
+(defcustom goose-context-buffer-prefix "File: %s\n%s"
+  "Prefix format for inserting buffer content into Goose. %s will be replaced by file path and buffer content."
+  :type 'string
+  :group 'goose)
+
+(defcustom goose-context-region-prefix "File: %s\nRegion:\n%s"
+  "Prefix format for inserting region content into Goose. %s will be replaced by file path and region."
+  :type 'string
+  :group 'ose)
+
 (defcustom goose-transient-key (kbd "C-c g")
   "Keybinding to invoke the Goose transient interface."
   :type 'key-sequence
@@ -168,7 +183,7 @@ If the session is not started, starts it automatically."
   "Insert the current buffer's file path into the Goose prompt."
   (interactive)
   (unless (buffer-file-name) (error "Buffer is not visiting a file"))
-  (goose--insert-context (format "Please read file from path: %s" (buffer-file-name)))
+  (goose--insert-context (format goose-context-file-path-prefix (buffer-file-name)))
   (message "Inserted file path into prompt"))
 
 ;;;###autoload
@@ -176,7 +191,7 @@ If the session is not started, starts it automatically."
   "Insert the current buffer's content and file path into the Goose prompt."
   (interactive)
   (goose--insert-context
-   (format "File: %s\n%s"
+   (format goose-context-buffer-prefix
            (or (buffer-file-name) "<no file>")
            (buffer-string)))
   (message "Inserted buffer content into prompt"))
@@ -187,7 +202,7 @@ If the session is not started, starts it automatically."
   (interactive)
   (unless (use-region-p) (error "No region selected"))
   (goose--insert-context
-   (format "File: %s\nRegion:\n%s"
+   (format goose-context-region-prefix
            (or (buffer-file-name) "<no file>")
            (buffer-substring-no-properties
             (region-beginning)
