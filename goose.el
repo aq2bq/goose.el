@@ -100,7 +100,7 @@ Use %s as placeholder for the raw text."
 (defcustom goose-context-region-prefix "File: %s\nRegion:\n%s"
   "Prefix format for inserting region content into Goose. %s will be replaced by file path and region."
   :type 'string
-  :group 'ose)
+  :group 'goose)
 
 (defcustom goose-transient-key (kbd "C-c g")
   "Keybinding to invoke the Goose transient interface."
