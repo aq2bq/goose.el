@@ -11,7 +11,7 @@
 ;;
 ;; Provides:
 ;; - Intuitive session management: start and restart Goose CLI sessions with easy labeling (name or timestamp)
-;; - Immediate context injection (file path, buffer, region, template, text) into the Goose prompt, sent directly (no internal queueing)
+;; - Immediate context injection (file path, buffer, region, template, text) into the Goose prompt, sent directly (no internal queuing)
 ;; - Prompt templates (consult-based), auto-detected from ~/.config/goose/prompts/
 ;; - Customizable context formatting, prompt directory, and keybinding (transient menu)
 ;; - Designed for rapid AI prompt iteration and CLI-interactive workflows from Emacs
@@ -53,13 +53,13 @@
 This mode provides `goose-mode-hook` for customizations.
 Do not call this mode interactively.  Use `goose-start-session` instead."
   (when (called-interactively-p 'interactive)
-    (user-error "`goose-mode` is an internal mode.  Use `M-x goose-start-session` instead.?")))
+    (user-error "`goose-mode` is an internal mode.  Use `M-x goose-start-session` instead")))
 
 ;; Prevent interactive use from misapplying to the current buffer
 (put 'goose-mode 'function-documentation
      "Goose terminal mode. Do not call directly. Use `goose-start-session` instead.")
 (put 'goose-mode 'interactive-form
-     '(progn (user-error "`goose-mode` is not meant to be called interactively.  Use `M-x goose-start-session` instead.?")))
+     '(progn (user-error "`goose-mode` is not meant to be called interactively.  Use `M-x goose-start-session` instead")))
 
 
 (defgroup goose nil
@@ -88,20 +88,17 @@ Use %s as placeholder for the raw text."
   :group 'goose)
 
 (defcustom goose-context-file-path-prefix "File from path: %s"
-  "Prefix format for inserting file path into Goose.
-%s will be replaced by the file path."
+  "Prefix format for inserting file path into Goose.  %s will be replaced by the file path."
   :type 'string
   :group 'goose)
 
 (defcustom goose-context-buffer-prefix "File: %s\n%s"
-  "Prefix format for inserting buffer content into Goose.
-%s will be replaced by file path and buffer content."
+  "Prefix format for inserting buffer content into Goose.  %s will be replaced by file path and buffer content."
   :type 'string
   :group 'goose)
 
 (defcustom goose-context-region-prefix "File: %s\nRegion:\n%s"
-  "Prefix format for inserting region content into Goose.
-%s will be replaced by file path and region."
+  "Prefix format for inserting region content into Goose.  %s will be replaced by file path and region."
   :type 'string
   :group 'goose)
 
@@ -129,7 +126,7 @@ Use %s as placeholder for the raw text."
     base-args))
 
 (defun goose--run-session (label args)
-  "Start or restart a Goose session buffer labelled LABEL with ARGS list."
+  "Start or restart a Goose session buffer labeled LABEL with ARGS list."
   (let ((bufname (format "%s<%s>" goose-default-buffer-name label)))
     (when (get-buffer bufname)
       (kill-buffer bufname))
