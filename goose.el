@@ -1,7 +1,7 @@
-;;; goose.el --- Integrate Emacs with Goose CLI via vterm -*- lexical-binding: t; -*-
+;;; goose.el --- Integrate Goose CLI via vterm -*- lexical-binding: t; -*-
 
 ;; Author: Daisuke Terada <pememo@gmail.com>
-;; Package-Requires: ((emacs "29") (vterm "20241218.331") (transient "0.9.1") (consult "2.5"))
+;; Package-Requires: ((emacs "29") (vterm "0.0.2") (transient "0.9.1") (consult "2.5"))
 ;; Version: 0.1.0
 ;; Keywords: tools, convenience, ai
 ;; URL: https://github.com/aq2bq/goose.el
@@ -37,7 +37,7 @@
 ;;
 ;; THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 ;; IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-;; FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+;; FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
 ;; AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 ;; LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 ;; OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
@@ -49,17 +49,17 @@
 (require 'consult)
 
 (define-derived-mode goose-mode vterm-mode "Goose"
-  "Major mode for Goose terminal (inherits vterm-mode).
+  "Major mode for Goose terminal (inherits `vterm-mode').
 This mode provides `goose-mode-hook` for customizations.
-Do not call this mode interactively. Use `goose-start-session` instead."
+Do not call this mode interactively.  Use `goose-start-session` instead."
   (when (called-interactively-p 'interactive)
-    (user-error "`goose-mode` is an internal mode. Use `M-x goose-start-session` instead.")))
+    (user-error "`goose-mode` is an internal mode.  Use `M-x goose-start-session` instead.?")))
 
 ;; Prevent interactive use from misapplying to the current buffer
 (put 'goose-mode 'function-documentation
      "Goose terminal mode. Do not call directly. Use `goose-start-session` instead.")
 (put 'goose-mode 'interactive-form
-     '(progn (user-error "`goose-mode` is not meant to be called interactively. Use `M-x goose-start-session` instead.")))
+     '(progn (user-error "`goose-mode` is not meant to be called interactively.  Use `M-x goose-start-session` instead.?")))
 
 
 (defgroup goose nil
@@ -88,21 +88,24 @@ Use %s as placeholder for the raw text."
   :group 'goose)
 
 (defcustom goose-context-file-path-prefix "File from path: %s"
-  "Prefix format for inserting file path into Goose. %s will be replaced by the file path."
+  "Prefix format for inserting file path into Goose.
+%s will be replaced by the file path."
   :type 'string
   :group 'goose)
 
 (defcustom goose-context-buffer-prefix "File: %s\n%s"
-  "Prefix format for inserting buffer content into Goose. %s will be replaced by file path and buffer content."
+  "Prefix format for inserting buffer content into Goose.
+%s will be replaced by file path and buffer content."
   :type 'string
   :group 'goose)
 
 (defcustom goose-context-region-prefix "File: %s\nRegion:\n%s"
-  "Prefix format for inserting region content into Goose. %s will be replaced by file path and region."
+  "Prefix format for inserting region content into Goose.
+%s will be replaced by file path and region."
   :type 'string
   :group 'goose)
 
-(defcustom goose-transient-key (kbd "C-c g")
+(defcustom goose-transient-key (kbd "C-c C-c g")
   "Keybinding to invoke the Goose transient interface."
   :type 'key-sequence
   :group 'goose)
@@ -135,7 +138,7 @@ Use %s as placeholder for the raw text."
         (let ((vterm-shell "/bin/bash"))
           (goose-mode)
           (rename-buffer bufname t)
-          (vterm-send-C-l) ;; suppress any previous output
+          (vterm-send-key "l" nil nil :ctrl) ;; suppress any previous output
           (vterm-send-string
            (mapconcat #'identity (cons goose-program-name args) " "))
           (vterm-send-return)))
@@ -176,7 +179,7 @@ If the session is not started, starts it automatically."
       (setq buf (get-buffer (goose--session-buffer-name))))
     (with-current-buffer buf
       (vterm-send-string (format goose-context-format text))
-      (vterm-send-C-j))))
+      (vterm-send-key "j" nil nil :ctrl))))
 
 ;;;###autoload
 (defun goose-add-context-file-path ()
