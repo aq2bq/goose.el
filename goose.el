@@ -116,11 +116,11 @@ Use %s as placeholder for the raw text."
 (defun goose--session-label (name)
   "Return session label for NAME, or timestamp string if NAME is empty."
   (if (and name (not (string-empty-p name)))
-      name
+      (shell-quote-argument name)
     (format-time-string "%Y%m%d-%H%M%S")))
 
 (defun goose--build-args (name)
-  "Construct Goose CLI argument list for 'session --name LABEL'."
+  "Construct Goose CLI argument list for 'session --name NAME'."
   (let* ((label (goose--session-label name))
          (base-args (list "session" "--name" label)))
     base-args))
