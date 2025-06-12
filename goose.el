@@ -88,17 +88,20 @@ Use %s as placeholder for the raw text."
   :group 'goose)
 
 (defcustom goose-context-file-path-prefix "File from path: %s"
-  "Prefix format for inserting file path into Goose. %s will be replaced by the file path."
+  "Prefix format for inserting file path into Goose.
+ %s will be replaced by the file path."
   :type 'string
   :group 'goose)
 
 (defcustom goose-context-buffer-prefix "File: %s\n%s"
-  "Prefix format for inserting buffer content into Goose. %s will be replaced by file path and buffer content."
+  "Prefix format for inserting buffer content into Goose.
+ %s will be replaced by file path and buffer content."
   :type 'string
   :group 'goose)
 
 (defcustom goose-context-region-prefix "File: %s\nRegion:\n%s"
-  "Prefix format for inserting region content into Goose. %s will be replaced by file path and region."
+  "Prefix format for inserting region content into Goose.
+ %s will be replaced by file path and region."
   :type 'string
   :group 'goose)
 
@@ -120,7 +123,7 @@ Use %s as placeholder for the raw text."
     (format-time-string "%Y%m%d-%H%M%S")))
 
 (defun goose--build-args (name)
-  "Construct Goose CLI argument list for 'session --name LABEL'."
+  "Construct Goose CLI argument list for \session --name LABEL\."
   (let* ((label (goose--session-label name))
          (base-args (list "session" "--name" label)))
     base-args))
@@ -135,7 +138,7 @@ Use %s as placeholder for the raw text."
         (let ((vterm-shell "/bin/bash"))
           (goose-mode)
           (rename-buffer bufname t)
-          (vterm-send-C-l) ;; suppress any previous output
+          (vterm-send-key "l" nil nil :ctrl) ;; suppress any previous output
           (vterm-send-string
            (mapconcat #'identity (cons goose-program-name args) " "))
           (vterm-send-return)))
@@ -176,7 +179,7 @@ If the session is not started, starts it automatically."
       (setq buf (get-buffer (goose--session-buffer-name))))
     (with-current-buffer buf
       (vterm-send-string (format goose-context-format text))
-      (vterm-send-C-j))))
+      (vterm-send-key "j" nil nil :ctrl))))
 
 ;;;###autoload
 (defun goose-add-context-file-path ()
