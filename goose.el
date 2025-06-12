@@ -1,7 +1,7 @@
-;;; goose.el --- Integrate Emacs with Goose CLI via vterm -*- lexical-binding: t; -*-
+;;; goose.el --- Integrate Goose CLI via vterm -*- lexical-binding: t; -*-
 
 ;; Author: Daisuke Terada <pememo@gmail.com>
-;; Package-Requires: ((emacs "29") (vterm "20241218.331") (transient "0.9.1") (consult "2.5"))
+;; Package-Requires: ((emacs "29") (vterm "0.0.2") (transient "0.9.1") (consult "2.5"))
 ;; Version: 0.1.0
 ;; Keywords: tools, convenience, ai
 ;; URL: https://github.com/aq2bq/goose.el
@@ -102,7 +102,7 @@ Use %s as placeholder for the raw text."
   :type 'string
   :group 'goose)
 
-(defcustom goose-transient-key (kbd "C-c g")
+(defcustom goose-transient-key (kbd "C-c C-c g")
   "Keybinding to invoke the Goose transient interface."
   :type 'key-sequence
   :group 'goose)
