@@ -1,7 +1,7 @@
-;;; goose.el --- Integrate Emacs with Goose CLI via vterm -*- lexical-binding: t; -*-
+;;; goose.el --- Integrate Goose CLI via vterm -*- lexical-binding: t; -*-
 
 ;; Author: Daisuke Terada <pememo@gmail.com>
-;; Package-Requires: ((emacs "29") (vterm "20241218.331") (transient "0.9.1") (consult "2.5"))
+;; Package-Requires: ((emacs "29") (vterm "0.0.2") (transient "0.9.1") (consult "2.5"))
 ;; Version: 0.1.0
 ;; Keywords: tools, convenience, ai
 ;; URL: https://github.com/aq2bq/goose.el
@@ -49,7 +49,7 @@
 (require 'consult)
 
 (define-derived-mode goose-mode vterm-mode "Goose"
-  "Major mode for Goose terminal (inherits vterm-mode).
+  "Major mode for Goose terminal (inherits `vterm-mode').
 This mode provides `goose-mode-hook` for customizations.
 Do not call this mode interactively.  Use `goose-start-session` instead."
   (when (called-interactively-p 'interactive)
@@ -102,7 +102,7 @@ Use %s as placeholder for the raw text."
   :type 'string
   :group 'goose)
 
-(defcustom goose-transient-key (kbd "C-c g")
+(defcustom goose-transient-key (kbd "C-c C-c g")
   "Keybinding to invoke the Goose transient interface."
   :type 'key-sequence
   :group 'goose)
@@ -116,11 +116,11 @@ Use %s as placeholder for the raw text."
 (defun goose--session-label (name)
   "Return session label for NAME, or timestamp string if NAME is empty."
   (if (and name (not (string-empty-p name)))
-      name
+      (shell-quote-argument name)
     (format-time-string "%Y%m%d-%H%M%S")))
 
 (defun goose--build-args (name)
-  "Construct Goose CLI argument list for 'session --name LABEL'."
+  "Construct Goose CLI argument list for 'session --name NAME'."
   (let* ((label (goose--session-label name))
          (base-args (list "session" "--name" label)))
     base-args))
@@ -135,7 +135,7 @@ Use %s as placeholder for the raw text."
         (let ((vterm-shell "/bin/bash"))
           (goose-mode)
           (rename-buffer bufname t)
-          (vterm-send-C-l) ;; suppress any previous output
+          (vterm-send-key "l" nil nil :ctrl) ;; suppress any previous output
           (vterm-send-string
            (mapconcat #'identity (cons goose-program-name args) " "))
           (vterm-send-return)))
@@ -176,7 +176,7 @@ If the session is not started, starts it automatically."
       (setq buf (get-buffer (goose--session-buffer-name))))
     (with-current-buffer buf
       (vterm-send-string (format goose-context-format text))
-      (vterm-send-C-j))))
+      (vterm-send-key "j" nil nil :ctrl))))
 
 ;;;###autoload
 (defun goose-add-context-file-path ()
