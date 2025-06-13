@@ -125,7 +125,10 @@ Use %s as placeholder for the raw text."
   (let ((bufname (format "%s<%s>" goose-default-buffer-name label)))
     (when (get-buffer bufname)
       (kill-buffer bufname))
-    (let ((vterm-buffer (generate-new-buffer bufname)))
+    (let* ((proj (when (fboundp 'project-current) (project-current)))
+           (root (when proj (project-root proj)))
+           (default-directory (or root default-directory))
+           (vterm-buffer (generate-new-buffer bufname)))
       (with-current-buffer vterm-buffer
         (let ((vterm-shell "/bin/bash"))
           (goose-mode)
@@ -137,7 +140,7 @@ Use %s as placeholder for the raw text."
       (setq goose--last-label label
             goose--last-args  args)
       (pop-to-buffer vterm-buffer)
-      (message "Goose session started in buffer %s" bufname))))
+      (message "Goose session started in buffer %s (dir: %s)" bufname default-directory))))
 
 ;;;###autoload
 (defun goose-start-session (&optional name)
