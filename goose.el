@@ -244,8 +244,6 @@ If the session is not started, starts it automatically."
    ("t" "Template" goose-add-context-template)
    ("x" "Text" goose-add-context-text)])
 
-;;;###autoload
-(global-set-key goose-transient-key 'goose-transient)
 
 (provide 'goose)
 ;;; goose.el ends here
