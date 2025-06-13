@@ -102,11 +102,6 @@ Use %s as placeholder for the raw text."
   :type 'string
   :group 'goose)
 
-(defcustom goose-transient-key (kbd "C-c C-c g")
-  "Keybinding to invoke the Goose transient interface."
-  :type 'key-sequence
-  :group 'goose)
-
 (defvar goose--last-args nil
   "Last Goose CLI argument list for restart.")
 
